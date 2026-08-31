@@ -51,7 +51,7 @@ void RefactorHandler::handle_nv_dtor(const CXXDestructorDecl *Dtor,
 
     const unsigned DiagID = Diag.getCustomDiagID(
             DiagnosticsEngine::Remark,
-            "Объявлен деструктор"
+            "Невиртуальный деструктор"
         );
     Diag.Report(Dtor->getLocation(), DiagID);
 }
@@ -65,25 +65,27 @@ void RefactorHandler::handle_miss_override(const CXXMethodDecl *Method,
     auto loc = Method->getNameInfo().getEndLoc();
     const auto LO = Rewrite.getLangOpts();
 
-    Token token;
-    while (!loc.isInvalid()) {
-        loc = Lexer::getLocForEndOfToken(loc, 0, SM, LO);
+    while (true) {
+        const auto token = Lexer::findNextToken(loc, SM, LO);
 
-        if (Lexer::getRawToken(loc, token, SM, LO))
+        if (!token)
             return;
 
-        if (token.is(tok::r_paren))
+        if (token->is(tok::r_paren)) {
+            const auto ins_loc = Lexer::getLocForEndOfToken(
+                token->getLocation(), 0, SM, LO
+            );
+
+            Rewrite.InsertText(ins_loc, " override");
             break;
+        }
 
-        loc = token.getLocation();
+        loc = token->getLocation();
     }
-
-    const auto ins_pos = Lexer::getLocForEndOfToken(token.getLocation(), 0, SM, LO);
-    Rewrite.InsertText(ins_pos, " override");
 
     const unsigned DiagID = Diag.getCustomDiagID(
             DiagnosticsEngine::Remark,
-            "Объявлен метод"
+            "Переопределен без override"
         );
     Diag.Report(Method->getLocation(), DiagID);
 }
@@ -98,21 +100,28 @@ void RefactorHandler::handle_crange_for(const VarDecl *LoopVar,
 
     const unsigned DiagID = Diag.getCustomDiagID(
             DiagnosticsEngine::Remark,
-            "Объявлена переменная"
+            "const без &"
         );
     Diag.Report(LoopVar->getLocation(), DiagID);
 }
 
 auto NvDtorMatcher()
 {
-    return cxxRecordDecl(isDerivedFrom(cxxRecordDecl(hasMethod(
-        cxxDestructorDecl(unless(isVirtual())).bind("nonVirtualDtor")
-    )))).bind("BaseWithNonVirtualDtor");
+    return cxxRecordDecl(isDerivedFrom(cxxRecordDecl(
+        hasMethod(cxxDestructorDecl(
+            unless(isVirtual()), unless(isImplicit())
+            ).bind("nonVirtualDtor")
+        )
+    )));
 }
 
 auto NoOverrideMatcher()
 {
-    return cxxMethodDecl(isOverride(), unless(hasAttr(attr::Override))).bind("missingOverride");
+    return cxxMethodDecl(
+        isOverride(),
+        unless(hasAttr(attr::Override)),
+        unless(cxxDestructorDecl())
+    ).bind("missingOverride");
 }
 
 auto NoRefConstVarInRangeLoopMatcher()
