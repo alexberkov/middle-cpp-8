@@ -5,8 +5,9 @@ TEST_DATA_FLDR="${PWD}/tests/tests_data"
 TMP_FLDR="$TEST_DATA_FLDR/tmp"
 
 # Список тестовых файлов и эталонов
-TEST_FILES=("test1.cpp" "test2.cpp" "test3.cpp")
-REF_FILES=("$TEST_DATA_FLDR/test1_ref.cpp" "$TEST_DATA_FLDR/test2_ref.cpp" "$TEST_DATA_FLDR/test3_ref.cpp")
+TEST_FILES=("test1.cpp" "test2.cpp" "test3.cpp" "test1_1.cpp" "test2_1.cpp" "test3_1.cpp")
+REF_FILES=("$TEST_DATA_FLDR/test1_ref.cpp" "$TEST_DATA_FLDR/test2_ref.cpp" "$TEST_DATA_FLDR/test3_ref.cpp"
+           "$TEST_DATA_FLDR/test1_1_ref.cpp" "$TEST_DATA_FLDR/test2_1_ref.cpp" "$TEST_DATA_FLDR/test3_1_ref.cpp")
 
 # Путь к утилите студента
 TOOL="./build/refactor_tool"
