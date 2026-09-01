@@ -1,15 +1,3 @@
-class BaseA {
-public:
-    virtual ~BaseA() {}
-};
-
-class BaseB {
-public:
-    virtual ~BaseB() {}
-};
-
-class MultiDerived : public BaseA, public BaseB {};
-
 class ProtectedBase {
 protected:
     virtual ~ProtectedBase() {}
@@ -28,18 +16,6 @@ public:
 };
 
 class LeafClass : public MiddleClass {};
-
-class VirtualRoot {
-public:
-    virtual ~VirtualRoot() {}
-};
-
-class NonVirtualMiddle : public VirtualRoot {
-public:
-    virtual ~NonVirtualMiddle() {}
-};
-
-class LeafFromVirtual : public NonVirtualMiddle {};
 
 class OrphanClass {
 public:
