@@ -36,6 +36,8 @@ add_executable(${PROJECT_NAME}_tests "${TEST_SRC_FILES}")
 target_link_libraries(${PROJECT_NAME}_tests PRIVATE gtest_main)
 target_include_directories(${PROJECT_NAME}_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+target_compile_options(${PROJECT_NAME}_tests PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+target_link_options(${PROJECT_NAME}_tests PRIVATE -fsanitize=address)
 
 include(GoogleTest)
 gtest_discover_tests(refactor_tool_tests)

@@ -36,6 +36,8 @@ target_include_directories(
 
 target_link_libraries(refactor_tool PRIVATE clangTooling clangBasic clangASTMatchers)
 
+target_compile_options(refactor_tool PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+target_link_options(refactor_tool PRIVATE -fsanitize=address)
 
 # # CONFIGURE THE PLUGIN LIBRARIES
 # # ==============================
